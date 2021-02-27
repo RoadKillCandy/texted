@@ -1,0 +1,470 @@
+﻿
+  start_at         = wooden_room
+  
+  
+  
+  locations {
+  
+       wooden_room : location " You are in an old room, you can see unknown bugs in the NORTH side of the room! \nGo North by clicking on north, or typing it or N. " ;
+       magic_grove : location " The magic is so strong here " ;
+       inside_hole : location " You can see gems growing out of the wall \nthese Gems are to deep to dig out, try using Examine on the mole, then go South and Examine the wall" ;
+       hole : location " You look down into a hole \nSmall bits of light spark from the hole";
+       dead_end : location "A DEAD END \n try examine room, then use take pickaxe and then get pickaxe" ;
+       gem_room: location "Gems poke out of the walls" ;
+       
+       sky : location "She has warped you out of the room and you are now on her back flying in the bright blue sky, she turnes and looks at you!" ;
+       
+       castle : location "A Castle made from what looks like glass but, on a closer up look is clearly crystal." ;
+       
+       open_door : location "You enter a room, the room is filled with books." ;
+       
+       hidden_room : location "The hidden room is small and smells of mold, you can feel a draft." ;
+       
+       small_shaft : location "Lucky for you, that you are small enough to fit into the hidden crawl space." ;
+       
+       coal_room : location "You are in a room filled with coal" ;
+       
+       fire_room : location "The fire belows high, so high you can't tell how high." ;
+   
+   storage_room : location "You are in a room, filled win junk." ;    
+   
+   locked_room : location "The room is very small, what could be here?" ;
+   
+   end_room : location "The unicorn would like you to open the locked potion for her" ;
+   
+   
+       
+       
+       
+       }
+       
+ connections {
+        from, direction, to = [ 
+        wooden_room, north, hole, 
+        hole, north, inside_hole, 
+        inside_hole, north, magic_grove,
+        hole, east, dead_end,
+        hole, west, gem_room,
+        magic_grove, west, sky,
+        sky, north, castle,
+        castle, west, open_door,
+        open_door, south, hidden_room
+        hidden_room, west, small_shaft,
+        small_shaft, west, coal_room,
+        coal_room, west, fire_room,
+        coal_room, south, storage_room,
+        coal_room, north, locked_room,
+        locked_room, north, end_room,
+        ]
+        
+      }
+        
+        objects {
+        mole : scenery "an grumpy mole" start_at = "inside_hole" ;
+        
+        scared_mole : scenery "Running Mole." ;
+        
+        torch : object "A bright torch." ;
+        
+        potion : object "Magic potion" ;
+        
+        darkness : scenery "Darkness" start_at= "locked_room" ;
+        
+        stinky_mud : object "A hand-full of smelly mud." ;
+        
+        unicorn : object "Female Unicorn" start_at= "magic_grove" ;
+        
+        flying_unicorn : scenery "Flying Unicorn." ;
+        
+        gem : object "A lovely fire red gem!" ;
+        
+        pickaxe: object "A strong pickaxe" ;
+        
+        lock : object "An old rusted lock." start_at= "hidden_room" ;
+        
+        broken_lock: object "A broken lock." ;
+        
+        book_shelf : scenery "Large bog oak booksehlf." start_at= "open_door" ; 
+        
+       move_bookshelf : scenery "Moved bookshelf." ;
+       
+       rusty_key: object "A Key covered in rust." ;
+       
+       light : scenery "Burning light." ;
+       
+       coal_wood : object "Wooden stick." ;
+       
+       
+       locked_door: scenery "Sturdy door with a sturdy lock." start_at= "coal_room"  ; 
+       
+       unlocked_door: scenery "An unlocked door." ;
+        
+        }
+        
+on_startup {
+      : print " THE GROVE OF MAGIC IS CLOSE, FIND IT AND SAVE THE UNICORN.\n type HELP for help,\n type SAVE to save\n and LOAD to load.\n Do not add a S onto the end of a word such as GEM." ;
+      : press_any_key ;
+      }
+      
+      ######################################
+      #  On Command                        #
+      ######################################
+      
+      on_command {
+         
+         : match "examine bookshelf"  {
+            : if (is_present "book_shelf") {
+               : print "The bookshelf seems to sound hallow." ;
+               
+            }
+            
+         }
+         : match "examine coal"  {
+            : if (is_at "coal_room") {
+              : print "YOU HAVE NOTHING TO PUT THE COAL IN HOWEVER YOU SEE A WOODEN STICK" ;
+               
+            }
+            
+         }
+         : match "light wood;use wood"  {
+            : if (is_carried "coal_wood" && has_not_created "torch") {
+               : print "You light the stick, giving you a torch!" ;
+               : swap o1 = "coal_wood"  o2 = "torch" ;
+               
+               
+            }
+            
+         }
+         
+         
+         : match "examine fire"  {
+            : if (is_at "fire_room") {
+               : print "I am not touching that!" ;
+               
+            }
+            
+         }
+        
+        
+         
+         
+         : match "examine mole;talk mole "  {
+            : if (is_present "mole") {
+               : print "\"what is that smell?\", says the grumpy MOLE" ;
+            }
+            
+            }
+            : match "examine wall;examine walls"  {
+              : if (is_at "hole") {
+                  : print "The walls are covered in stinky mud!" ;
+                  
+               }
+               
+            }
+           : match "pick mud;get mud"  {
+              : if (has_not_created "stinky_mud" && is_at "hole") {
+                 : create "stinky_mud" ;
+                 : redescribe;
+                 
+              }
+              
+           }
+          :match "use mud" {
+          : if (is_present "stinky_mud") {
+             : print "This would make a great gift for SOMEONE ELSE, GREEDY!" ;
+             
+             
+          }
+          
+           } 
+           
+           : match "give mud"  {
+              : if (is_present "mole" && is_carried "stinky_mud") {
+                 : print "The MOLE sniffs the mud, the smell is to strong and he flees in fear of the bad smell!" ;
+                 : destroy "stinky_mud" ;
+                 : swap o1 = "mole"  o2 = "scared_mole" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+              }
+              
+           }
+         
+              : match "unlock door"  {
+                 : if (is_present "locked_door" && is_carried "rusty_key") {
+                    : print "YOU UNLOCK THE STURDY DOOR!" ;
+                    : destroy "rusty_key" ;
+                    : swap o1 = "locked_door"  o2 = "unlocked_door" ;
+                    
+                 }
+                 
+              }
+              
+           
+           
+           
+           : match "examine room"  {
+           : if (is_at "dead_end") {
+              : print "You see a pick" ;
+              
+           }
+           
+              
+           }
+           
+           : match "take pickaxe;get pickaxe"  {
+             : if (has_not_created "pickaxe" && is_at "dead_end") {
+                : create "pickaxe" ;
+                : redescribe;
+                
+                
+             }
+              
+           }
+           
+          : match "examine gems"  {
+             : if (is_at "gem_room") {
+                : print "If you had a tool you could mine these gems unlike the other rooms!" ;
+                
+             }
+             
+          }
+           : match "mine gem;take gem;get gem"  {
+              : if (has_not_created "gem" && is_at "gem_room" && is_carried "pickaxe") {
+                 : create "gem" ;
+                 : redescribe;
+              }
+              
+           }
+           : match "get key;take key"  {
+              : if (has_not_created "rusty_key" && is_at "storage_room") {
+                 : create "rusty_key" ;
+                 : redescribe;
+                 
+              }
+              
+           }
+           
+           : match "give gem"  {
+              : if (is_present "unicorn" && is_carried "gem") {
+                 : print "The gem glows a bright red as you hand her the gem. the ligh fills the room" ;
+                 : destroy "gem" ;
+                 : swap o1 = "unicorn"  o2 = "flying_unicorn" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+                 
+              }
+              
+           }
+           : match "use torch;wave torch"  {
+              : if (is_present "darkness" && is_carried "torch") {
+                : destroy "darkness" ;
+                 : swap o1 = "darkness"  o2 = "light" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+              }
+              
+           }
+           
+           
+           : match "use key"  {
+              : if (is_present "locked_door" && is_carried "rusty_key") {
+                 : destroy "rusty_key" ;
+                 : swap o1 = "locked_door"  o2 = "unlocked_door" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+              }
+              
+           }
+           
+           : match "examine unicorn"  {
+              : if (is_present "unicorn") {
+                 : print "She is a pearl white Unicorn, her horn is gold with some gems in it, however, you can see one is missing!" ;
+                 
+              }
+              
+           }
+           : match "examine room"  {
+              : if (is_at "storage_room") {
+                 : print "You see a box of jeys on the wall." ;
+                 
+              }
+              
+           }
+           
+           : match "use pickaxe"  {
+              : if (is_present "lock") {
+                 : print "You smash the lock, it scatters across the floor." ;
+                 : swap o1 = "lock"  o2 = "broken_lock" ;
+               : press_any_key ;
+               : redescribe;
+               
+              }
+              
+           }
+           : match "push bookshelf;pull bookshelf"  {
+              : if (is_present "book_shelf") {
+                : print "You push the bookcase." ;
+                : swap o1 = "book_shelf"  o2 = "move_bookshelf" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+                 
+              }
+              
+           }
+           
+           : match "take potion"  {
+              : if (is_at "end_room") {
+                 : print "You open the bottle for the Unicorn, she turns into the lost queen." ;
+                 : win_game ;
+                 : print "YOU WIN" ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+              }
+              
+           }
+           : match "get wood;take wood"  {
+              : if (is_at "coal_room" && has_not_created "coal_wood") {
+                 : create "coal_wood" ;
+                 : print "You got a wooden stick." ;
+                 : press_any_key ;
+                 : redescribe;
+                 
+                 
+              }
+              
+           }
+           
+           
+           }
+           
+         
+         
+         
+      ######################################
+      #  On Describe                       #
+      ######################################
+      
+      on_describe {
+      
+      : if (is_present "darkness") {
+         : print "You will need to find something to light." ;
+         
+      }
+      
+      : if (is_present "book_shelf") {
+        : print "It's a large solid bog oak bookshelf." ;
+         
+      }
+      
+      : if (is_present "lock") {
+         : print "An old rusted lock." ;
+         
+      }
+      
+         
+         : if (is_present "mole") {
+            : print "The MOLE's nose bobs up and down as he sniffs his way around the cave!" ;
+            
+         }
+         }
+         
+         
+    
+          
+           
+        
+         
+      
+      
+######################################
+#  Barriers                          #
+######################################
+
+barriers {
+
+barrier_unicorn : block_path {
+
+   from    = magic_grove
+   to      =  sky
+   message = The path is blocked by rubble.
+   block_when_exists = unicorn
+   show_blocked_exit = true
+}
+
+barrier_darkness : block_path {
+
+   from    = locked_room
+   to      = end_room
+   message = The path is blocked by a door.
+   block_when_exists = darkness
+   show_blocked_exit = true
+}
+
+
+  barrier_door : block_path {
+  
+     from    = coal_room
+     to      = locked_room
+     message = The path is blocked by a sturdy. door
+     block_when_exists = locked_door
+     show_blocked_exit = true
+     
+  }
+   
+   barrier_book_shelf : block_path {
+   
+      from    = open_door
+      to      = hidden_room
+      message = A Bookcase is in front of you!
+      block_when_exists = book_shelf
+      show_blocked_exit = true
+   }
+   
+   barrier_hidden_room : block_path {
+   
+      from    = hidden_room
+      to      = small_shaft
+      message = A rusted lock.
+      block_when_exists = lock 
+      show_blocked_exit = true
+      
+   }
+   
+   barrier_inside_hole : block_path {
+   
+      from    = inside_hole
+      to      = magic_grove
+      message = A MOLE BLOCKS YOUR PATH!
+      block_when_exists = mole
+      show_blocked_exit = true
+      
+   }
+   
+} 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
